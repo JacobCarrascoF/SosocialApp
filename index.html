@@ -112,6 +112,14 @@
     display:flex;align-items:center;justify-content:center;
     font-size:22px;
   }
+  .menu-card .icon svg{
+    width:22px;height:22px;
+    stroke:var(--blue-dark);
+    fill:none;
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
   .menu-card span{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;}
 
   .section-title{
@@ -265,7 +273,8 @@
     align-items:center;
     gap:3px;
   }
-  .nav-item .nav-icon{font-size:19px;}
+  .nav-item .nav-icon{display:block;margin:0 auto 2px;}
+  .nav-item .nav-icon svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto;}
   .nav-item.active{color:var(--blue);}
 
   .toast{
@@ -326,27 +335,31 @@
   <section class="screen active" id="screen-inici">
     <div class="grid-menu">
       <div class="menu-card" onclick="showScreen('reserva')">
-        <div class="icon">🎸</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
         <span>Reservar sessió (individual o grupal)</span>
       </div>
       <div class="menu-card" onclick="showScreen('bo')">
-        <div class="icon">🎁</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 8h18M12 8v13"/><path d="M12 8c-1.5-3-5-4-5-1.5S9 8 12 8c3 0 5.5-1 5-3.5S13.5 5 12 8Z"/></svg></div>
         <span>Comprar bo regal</span>
       </div>
       <div class="menu-card" onclick="showScreen('escola')">
-        <div class="icon">🏫</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 9h16"/></svg></div>
         <span>Escola de Música Sosocial</span>
       </div>
       <div class="menu-card" onclick="showScreen('agenda')">
-        <div class="icon">📅</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
         <span>Agenda i notícies</span>
       </div>
+      <div class="menu-card" onclick="window.open('https://drive.google.com/drive/folders/13TeF1grX_dTiw0XAXC4smdpb0bcJnqRY?usp=sharing', '_blank')">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M6 3h12v14a3 3 0 1 1-3-3h3M6 3v14a3 3 0 1 0 3-3H6"/></svg></div>
+        <span>Partitures</span>
+      </div>
       <div class="menu-card" onclick="showScreen('info')">
-        <div class="icon">ℹ️</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></svg></div>
         <span>Informació i contacte</span>
       </div>
       <div class="menu-card" style="grid-column:1 / -1;flex-direction:row;justify-content:center;" onclick="anarAltaCombo()">
-        <div class="icon">📝</div>
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
         <span>Apuntar-se al combo</span>
       </div>
     </div>
@@ -363,8 +376,13 @@
       <h3>Tipus de sessió</h3>
       <div class="option-row" id="tipus-sessio-options">
         <div class="option-pill" data-value="individual">Individual</div>
-        <div class="option-pill" data-value="grupal">Grupal (fins a 4)</div>
+        <div class="option-pill" data-value="grupal">Grupal</div>
       </div>
+
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer;">
+        <input type="checkbox" id="ja-alumne" style="width:18px;height:18px;margin:0;">
+        <span style="font-size:13.5px;font-weight:600;color:var(--ink);">Ja sóc alumne de Sosocial</span>
+      </label>
     </div>
 
     <div class="card" id="bloc-individual">
@@ -391,7 +409,7 @@
         <div class="option-pill" data-value="Javi">Javi</div>
         <div class="option-pill" data-value="Jacob">Jacob</div>
       </div>
-      <div class="price-tag">75€ <small>/ 1h · fins a 4 persones</small></div>
+      <div class="price-tag" id="price-tag-grupal">75€ <small>/ 1h</small></div>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;">
         Ideal per practicar en grup o per regalar-ho a algú que ja conegui l'escola.
       </p>
@@ -427,8 +445,8 @@
         </p>
       </div>
 
-      <button class="btn btn-primary" onclick="void(0);" style="margin-top:10px;opacity:0.55;cursor:not-allowed;" disabled id="btn-pagar-paypal">
-        💳 Pagar amb PayPal (properament)
+      <button class="btn btn-primary" onclick="pagarPaypal()" style="margin-top:10px;" id="btn-pagar-paypal">
+        💳 Pagar 23€ amb PayPal
       </button>
     </div>
   </section>
@@ -443,10 +461,18 @@
     <div class="card">
       <h3>Tria el tipus de bo</h3>
       <div class="option-row" id="bo-options" style="flex-wrap:wrap;">
-        <div class="option-pill" data-value="individual" data-price="23" style="flex:1 1 100%;">Individual · 30 min · 23€</div>
-        <div class="option-pill" data-value="grup4" data-price="75" style="flex:1 1 100%;">Grup fins a 4 · 1h · 75€</div>
-        <div class="option-pill" data-value="grup5" data-price="95" style="flex:1 1 100%;">Grup 5+ · 1,5h · 95€</div>
+        <div class="option-pill" data-value="individual" style="flex:1 1 100%;">Individual · 30 min</div>
+        <div class="option-pill" data-value="grupal" style="flex:1 1 100%;">Grupal · 1h</div>
+        <div class="option-pill" data-value="bo5" style="flex:1 1 100%;">Bo 5 sessions individuals</div>
+        <div class="option-pill" data-value="grupal90" style="flex:1 1 100%;">Grupal · 1h 30min</div>
       </div>
+
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px;cursor:pointer;">
+        <input type="checkbox" id="bo-ja-alumne" style="width:18px;height:18px;margin:0;">
+        <span style="font-size:13.5px;font-weight:600;color:var(--ink);">Ja sóc alumne de Sosocial</span>
+      </label>
+
+      <div class="price-tag" id="price-tag-bo">23€</div>
 
       <label>Nom de qui regala</label>
       <input type="text" id="bo-nom-regala" placeholder="El teu nom">
@@ -454,11 +480,10 @@
       <label>Nom de qui rep el regal (opcional)</label>
       <input type="text" id="bo-nom-rep" placeholder="Nom del destinatari">
 
-      <label>Telèfon de contacte</label>
-      <input type="tel" id="bo-tel" placeholder="Ex: 600 000 000">
+      <label>Email de contacte</label>
+      <input type="email" id="bo-email" placeholder="Ex: nom@exemple.com">
 
-      <button class="btn btn-primary" onclick="comprarBoWhatsApp()">📱 Comprar bo per WhatsApp</button>
-      <button class="btn btn-outline" onclick="comprarBoEmail()" style="margin-top:10px;">✉️ Comprar bo per correu</button>
+      <button class="btn btn-primary" onclick="comprarBoPaypal()" id="btn-comprar-bo" style="margin-top:10px;">💳 Comprar bo amb PayPal</button>
     </div>
 
     <div class="voucher-preview" id="voucher-preview" style="display:none;">
@@ -641,19 +666,19 @@
 
   <nav class="bottom-nav">
     <button class="nav-item active" data-screen="inici" onclick="showScreen('inici')">
-      <span class="nav-icon">🏠</span>Inici
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/></svg></span>Inici
     </button>
     <button class="nav-item" data-screen="reserva" onclick="showScreen('reserva')">
-      <span class="nav-icon">🎸</span>Reservar
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Reservar
     </button>
     <button class="nav-item" data-screen="bo" onclick="showScreen('bo')">
-      <span class="nav-icon">🎁</span>Bo regal
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 8h18M12 8v13"/><path d="M12 8c-1.5-3-5-4-5-1.5S9 8 12 8c3 0 5.5-1 5-3.5S13.5 5 12 8Z"/></svg></span>Bo regal
     </button>
     <button class="nav-item" data-screen="agenda" onclick="showScreen('agenda')">
-      <span class="nav-icon">📅</span>Agenda
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>Agenda
     </button>
     <button class="nav-item" data-screen="info" onclick="showScreen('info')">
-      <span class="nav-icon">ℹ️</span>Info
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></svg></span>Info
     </button>
   </nav>
 
@@ -669,8 +694,6 @@ const CAL_LINKS = {
   "Guitarra elèctrica|Javi": "https://cal.com/sosocialmusica/guitarra-electrica-o-flamenca",
   "Guitarra flamenca|Javi": "https://cal.com/sosocialmusica/guitarra-electrica-o-flamenca",
   "Baix|Javi": "https://cal.com/sosocialmusica/baix-individual-javi-lopez",
-  "Piano|Estela Navarro": "https://cal.com/sosocialmusica/piano-o-cant-estela-navarro",
-  "Cant|Estela Navarro": "https://cal.com/sosocialmusica/piano-o-cant-estela-navarro",
   "Piano|Estela Millan": "https://cal.com/sosocialmusica/piano-o-cant-estela-millan",
   "Cant|Estela Millan": "https://cal.com/sosocialmusica/piano-o-cant-estela-millan"
 };
@@ -768,19 +791,53 @@ document.querySelectorAll('#tipus-sessio-options .option-pill').forEach(pill=>{
 
     const blocIndividual = document.getElementById('bloc-individual');
     const blocGrupal = document.getElementById('bloc-grupal');
-    const btnPaypal = document.getElementById('btn-pagar-paypal');
 
     if(pill.dataset.value === 'grupal'){
       blocIndividual.style.display = 'none';
       blocGrupal.style.display = 'block';
-      btnPaypal.textContent = '💳 Pagar 75€ amb PayPal (properament)';
     } else {
       blocIndividual.style.display = 'block';
       blocGrupal.style.display = 'none';
-      btnPaypal.textContent = '💳 Pagar 23€ amb PayPal (properament)';
     }
+    actualitzarPreus();
   });
 });
+
+document.getElementById('ja-alumne').addEventListener('change', actualitzarPreus);
+
+const PREUS = {
+  individual: { normal: 23, alumne: 20 },
+  grupal: { normal: 75, alumne: 50 },
+  bo5: { normal: 105, alumne: 90 },
+  grupal90: { normal: 105, alumne: 70 }
+};
+
+function actualitzarPreus(){
+  const tipusSessio = document.querySelector('#tipus-sessio-options .selected');
+  const jaAlumne = document.getElementById('ja-alumne').checked;
+  const btnPaypal = document.getElementById('btn-pagar-paypal');
+
+  const tipus = tipusSessio ? tipusSessio.dataset.value : 'individual';
+  const preu = jaAlumne ? PREUS[tipus].alumne : PREUS[tipus].normal;
+
+  document.getElementById('price-tag-individual').innerHTML = `${PREUS.individual[jaAlumne ? 'alumne' : 'normal']}€ <small>/ 30 min</small>`;
+  document.getElementById('price-tag-grupal').innerHTML = `${PREUS.grupal[jaAlumne ? 'alumne' : 'normal']}€ <small>/ 1h</small>`;
+
+  btnPaypal.textContent = `💳 Pagar ${preu}€ amb PayPal`;
+}
+
+const PAYPAL_LINK = "https://www.paypal.biz/sosocialmusica";
+
+function pagarPaypal(){
+  const tipusSessio = document.querySelector('#tipus-sessio-options .selected');
+  if(!tipusSessio){ showToast("Tria primer el tipus de sessió"); return; }
+
+  const jaAlumne = document.getElementById('ja-alumne').checked;
+  const tipus = tipusSessio.dataset.value;
+  const import_ = PREUS[tipus][jaAlumne ? 'alumne' : 'normal'];
+
+  window.open(`${PAYPAL_LINK}/${import_}`, '_blank');
+}
 
 // Selección de profesor para sessió grupal
 document.querySelectorAll('#professor-grupal-options .option-pill').forEach(pill=>{
@@ -804,8 +861,8 @@ const PROFESSORS_PER_INSTRUMENT = {
   "Guitarra elèctrica": ["Javi", "Jacob"],
   "Guitarra flamenca": ["Javi"],
   "Baix": ["Javi"],
-  "Piano": ["Estela Navarro", "Estela Millan"],
-  "Cant": ["Estela Navarro", "Estela Millan"]
+  "Piano": ["Estela Millan"],
+  "Cant": ["Estela Millan"]
 };
 
 let professorSeleccionat = null;
@@ -858,39 +915,46 @@ document.querySelectorAll('#bo-options .option-pill').forEach(pill=>{
   pill.addEventListener('click', ()=>{
     document.querySelectorAll('#bo-options .option-pill').forEach(p=>p.classList.remove('selected'));
     pill.classList.add('selected');
-    boSeleccionado = {tipo: pill.dataset.value, precio: pill.dataset.price, label: pill.textContent.trim()};
+    boSeleccionado = pill.dataset.value;
+    actualitzarPreuBo();
   });
 });
 
-function recollirDadesBo(){
+document.getElementById('bo-ja-alumne').addEventListener('change', actualitzarPreuBo);
+
+function actualitzarPreuBo(){
+  const jaAlumne = document.getElementById('bo-ja-alumne').checked;
+  const tipus = boSeleccionado || 'individual';
+  const preu = PREUS[tipus][jaAlumne ? 'alumne' : 'normal'];
+  document.getElementById('price-tag-bo').textContent = `${preu}€`;
+  document.getElementById('btn-comprar-bo').textContent = `💳 Comprar bo amb PayPal (${preu}€)`;
+}
+
+const BO_LABELS = {
+  individual: 'Individual · 30 min',
+  grupal: 'Grupal · 1h',
+  bo5: 'Bo 5 sessions individuals',
+  grupal90: 'Grupal · 1h 30min'
+};
+
+function comprarBoPaypal(){
   const nomRegala = document.getElementById('bo-nom-regala').value.trim();
   const nomRep = document.getElementById('bo-nom-rep').value.trim();
-  const tel = document.getElementById('bo-tel').value.trim();
+  const email = document.getElementById('bo-email').value.trim();
 
-  if(!boSeleccionado){ showToast("Tria un tipus de bo"); return null; }
-  if(!nomRegala || !tel){ showToast("Omple el nom i el telèfon"); return null; }
+  if(!boSeleccionado){ showToast("Tria un tipus de bo"); return; }
+  if(!nomRegala || !email){ showToast("Omple el nom i l'email"); return; }
+
+  const jaAlumne = document.getElementById('bo-ja-alumne').checked;
+  const preu = PREUS[boSeleccionado][jaAlumne ? 'alumne' : 'normal'];
+  const label = BO_LABELS[boSeleccionado];
 
   document.getElementById('voucher-preview').style.display = 'block';
-  document.getElementById('voucher-title').textContent = `Bo regal · ${boSeleccionado.label.split('·')[0].trim()}`;
-  document.getElementById('voucher-desc').textContent = `De part de ${nomRegala}${nomRep ? " per a "+nomRep : ""} · ${boSeleccionado.precio}€`;
+  document.getElementById('voucher-title').textContent = `Bo regal · ${label}`;
+  document.getElementById('voucher-desc').textContent = `De part de ${nomRegala}${nomRep ? " per a "+nomRep : ""} · ${preu}€`;
 
-  const cos = `Vull comprar un bo regal (${boSeleccionado.label}) de part de ${nomRegala}${nomRep ? " per a "+nomRep : ""}. Telèfon: ${tel}.`;
-  return cos;
-}
-
-function comprarBoWhatsApp(){
-  const cos = recollirDadesBo();
-  if(!cos) return;
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! "+cos)}`, '_blank');
-  showToast("T'obrim WhatsApp per confirmar el pagament del bo");
-}
-
-function comprarBoEmail(){
-  const cos = recollirDadesBo();
-  if(!cos) return;
-  const subjecte = "Compra de bo regal";
-  window.location.href = `mailto:${EMAIL_SOSOCIAL}?subject=${encodeURIComponent(subjecte)}&body=${encodeURIComponent(cos)}`;
-  showToast("T'obrim el correu per confirmar el pagament del bo");
+  window.open(`${PAYPAL_LINK}/${preu}`, '_blank');
+  showToast("T'obrim PayPal per completar el pagament del bo");
 }
 
 function recollirDadesAlta(){
