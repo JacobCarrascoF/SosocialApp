@@ -446,7 +446,7 @@
       </div>
 
       <button class="btn btn-primary" onclick="pagarPaypal()" style="margin-top:10px;" id="btn-pagar-paypal">
-        💳 Pagar 23€ amb PayPal
+        💳 Pagar 23€ amb targeta
       </button>
     </div>
   </section>
@@ -483,7 +483,7 @@
       <label>Email de contacte</label>
       <input type="email" id="bo-email" placeholder="Ex: nom@exemple.com">
 
-      <button class="btn btn-primary" onclick="comprarBoPaypal()" id="btn-comprar-bo" style="margin-top:10px;">💳 Comprar bo amb PayPal</button>
+      <button class="btn btn-primary" onclick="comprarBoPaypal()" id="btn-comprar-bo" style="margin-top:10px;">💳 Comprar bo amb targeta</button>
     </div>
 
     <div class="voucher-preview" id="voucher-preview" style="display:none;">
@@ -503,27 +503,33 @@
     <div class="card">
       <h3>Properes dates</h3>
       <div class="news-item">
-        <div class="news-date"><span class="d">20</span><span class="m">Des</span></div>
+        <div class="news-date"><span class="d">8</span><span class="m">Set</span></div>
         <div class="news-body">
-          <h4>Concert de Nadal</h4>
-          <p>Actuació dels alumnes a Fundació Joan Bardina, 18:00h.</p>
+          <h4>Inici de curs</h4>
+          <p>Comencen les classes del curs 2026-2027.</p>
         </div>
       </div>
       <div class="news-item">
-        <div class="news-date"><span class="d">15</span><span class="m">Jun</span></div>
+        <div class="news-date"><span class="d">22</span><span class="m">Des</span></div>
         <div class="news-body">
-          <h4>Festival de fi de curs</h4>
-          <p>Totes les combos i grups pugen a l'escenari. Més detalls properament.</p>
+          <h4>Vacances de Nadal</h4>
+          <p>Del 22 de desembre de 2026 al 7 de gener de 2027, ambdós inclosos.</p>
         </div>
       </div>
-    </div>
-
-    <div class="card">
-      <h3>Vídeo destacat</h3>
-      <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Vídeo Sosocial" allowfullscreen></iframe>
+      <div class="news-item">
+        <div class="news-date"><span class="d">20</span><span class="m">Mar</span></div>
+        <div class="news-body">
+          <h4>Vacances de Setmana Santa</h4>
+          <p>Del 20 al 29 de març de 2027, ambdós inclosos.</p>
+        </div>
       </div>
-      <p style="font-size:12.5px;color:var(--muted);">Substituïu aquest vídeo per l'enllaç que vulgueu compartir amb les famílies.</p>
+      <div class="news-item">
+        <div class="news-date"><span class="d">21</span><span class="m">Jun</span></div>
+        <div class="news-body">
+          <h4>Final de curs</h4>
+          <p>Últim dia de classes del curs 2026-2027.</p>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -823,10 +829,15 @@ function actualitzarPreus(){
   document.getElementById('price-tag-individual').innerHTML = `${PREUS.individual[jaAlumne ? 'alumne' : 'normal']}€ <small>/ 30 min</small>`;
   document.getElementById('price-tag-grupal').innerHTML = `${PREUS.grupal[jaAlumne ? 'alumne' : 'normal']}€ <small>/ 1h</small>`;
 
-  btnPaypal.textContent = `💳 Pagar ${preu}€ amb PayPal`;
+  btnPaypal.textContent = `💳 Pagar ${preu}€ amb targeta`;
 }
 
-const PAYPAL_LINK = "https://www.paypal.biz/sosocialmusica";
+const PAYPAL_LINKS = {
+  individual:  { normal: "https://www.paypal.com/ncp/payment/73DTKUCEG45AU", alumne: "https://www.paypal.com/ncp/payment/DZHKLTQMQ8LTE" },
+  grupal:      { normal: "https://www.paypal.com/ncp/payment/ZN4WGH9Q7TZPG", alumne: "https://www.paypal.com/ncp/payment/HMXQ2Y5KPY54J" },
+  grupal90:    { normal: "https://www.paypal.com/ncp/payment/33FPCUEVFWBBW", alumne: "https://www.paypal.com/ncp/payment/FV7P42V2KTL7Q" },
+  bo5:         { normal: "https://www.paypal.com/ncp/payment/5JP8A8SFS2HB4", alumne: "https://www.paypal.com/ncp/payment/FZXESNAGJ3EKY" }
+};
 
 function pagarPaypal(){
   const tipusSessio = document.querySelector('#tipus-sessio-options .selected');
@@ -834,9 +845,9 @@ function pagarPaypal(){
 
   const jaAlumne = document.getElementById('ja-alumne').checked;
   const tipus = tipusSessio.dataset.value;
-  const import_ = PREUS[tipus][jaAlumne ? 'alumne' : 'normal'];
+  const link = PAYPAL_LINKS[tipus][jaAlumne ? 'alumne' : 'normal'];
 
-  window.open(`${PAYPAL_LINK}/${import_}`, '_blank');
+  window.open(link, '_blank');
 }
 
 // Selección de profesor para sessió grupal
@@ -927,7 +938,7 @@ function actualitzarPreuBo(){
   const tipus = boSeleccionado || 'individual';
   const preu = PREUS[tipus][jaAlumne ? 'alumne' : 'normal'];
   document.getElementById('price-tag-bo').textContent = `${preu}€`;
-  document.getElementById('btn-comprar-bo').textContent = `💳 Comprar bo amb PayPal (${preu}€)`;
+  document.getElementById('btn-comprar-bo').textContent = `💳 Comprar bo amb targeta (${preu}€)`;
 }
 
 const BO_LABELS = {
@@ -948,13 +959,14 @@ function comprarBoPaypal(){
   const jaAlumne = document.getElementById('bo-ja-alumne').checked;
   const preu = PREUS[boSeleccionado][jaAlumne ? 'alumne' : 'normal'];
   const label = BO_LABELS[boSeleccionado];
+  const link = PAYPAL_LINKS[boSeleccionado][jaAlumne ? 'alumne' : 'normal'];
 
   document.getElementById('voucher-preview').style.display = 'block';
   document.getElementById('voucher-title').textContent = `Bo regal · ${label}`;
   document.getElementById('voucher-desc').textContent = `De part de ${nomRegala}${nomRep ? " per a "+nomRep : ""} · ${preu}€`;
 
-  window.open(`${PAYPAL_LINK}/${preu}`, '_blank');
-  showToast("T'obrim PayPal per completar el pagament del bo");
+  window.open(link, '_blank');
+  showToast("T'obrim la passarel·la de pagament per completar el pagament del bo");
 }
 
 function recollirDadesAlta(){
